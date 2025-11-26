@@ -257,7 +257,7 @@ export default function Chat() {
               <>
                 <div className="w-full flex justify-center mb-4">
                   <div className="max-w-3xl w-full">
-                    <h2 className="text-xl font-semibold tracking-tight">
+                    <h2 className="text-xl font-semibold tracking-tight pl-11">
                       {selectedHead}
                     </h2>
                   </div>
