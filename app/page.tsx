@@ -149,12 +149,12 @@ export default function Chat() {
       {/* Left sidebar */}
       <aside className="hidden md:flex flex-col w-72 border-r bg-sidebar text-sidebar-foreground px-6 py-6 gap-8">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/70">
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-foreground">
             Process
           </p>
           <div className="mt-3 space-y-2 text-sm">
             <button
-              className={`w-full text-left px-3 py-2 rounded-xl transition-colors shadow-sm ${
+              className={`w-full text-left px-3 py-2 rounded-xl transition-colors shadow-sm cursor-pointer ${
                 selectedHead === "Sales Process Queries"
                   ? "bg-primary text-primary-foreground"
                   : "bg-card hover:bg-secondary"
@@ -164,7 +164,7 @@ export default function Chat() {
               Sales Process Queries
             </button>
             <button
-              className={`w-full text-left px-3 py-2 rounded-xl transition-colors ${
+              className={`w-full text-left px-3 py-2 rounded-xl transition-colors cursor-pointer ${
                 selectedHead === "Marketing Queries"
                   ? "bg-primary text-primary-foreground"
                   : "hover:bg-secondary"
@@ -174,7 +174,7 @@ export default function Chat() {
               Marketing Queries
             </button>
             <button
-              className={`w-full text-left px-3 py-2 rounded-xl transition-colors ${
+              className={`w-full text-left px-3 py-2 rounded-xl transition-colors cursor-pointer ${
                 selectedHead === "Developer Queries about Codebase"
                   ? "bg-primary text-primary-foreground"
                   : "hover:bg-secondary"
@@ -186,7 +186,7 @@ export default function Chat() {
               Developer Queries about Codebase
             </button>
             <button
-              className={`w-full text-left px-3 py-2 rounded-xl transition-colors ${
+              className={`w-full text-left px-3 py-2 rounded-xl transition-colors cursor-pointer ${
                 selectedHead === "Employee & HR Query"
                   ? "bg-primary text-primary-foreground"
                   : "hover:bg-secondary"
