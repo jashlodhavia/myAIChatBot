@@ -137,8 +137,50 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex h-screen items-center justify-center font-sans dark:bg-black">
-      <main className="w-full dark:bg-black h-screen relative">
+    <div className="flex h-screen items-stretch font-sans dark:bg-black">
+      {/* Left sidebar */}
+      <aside className="hidden md:flex flex-col w-72 border-r bg-sidebar text-sidebar-foreground px-6 py-6 gap-8">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Process
+          </p>
+          <div className="mt-3 space-y-2 text-sm">
+            <button className="w-full text-left px-3 py-2 rounded-xl bg-card hover:bg-primary hover:text-primary-foreground transition-colors shadow-sm">
+              Sales Process Queries
+            </button>
+            <button className="w-full text-left px-3 py-2 rounded-xl hover:bg-secondary transition-colors">
+              Marketing Queries
+            </button>
+            <button className="w-full text-left px-3 py-2 rounded-xl hover:bg-secondary transition-colors">
+              Developer Queries about Codebase
+            </button>
+            <button className="w-full text-left px-3 py-2 rounded-xl hover:bg-secondary transition-colors">
+              Employee &amp; HR Query
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Image
+          </p>
+          <div className="mt-3 space-y-2 text-sm">
+            <button className="w-full text-left px-3 py-2 rounded-xl hover:bg-secondary transition-colors">
+              Creative as per Guidelines
+            </button>
+            <button className="w-full text-left px-3 py-2 rounded-xl hover:bg-secondary transition-colors">
+              PPT creatives, icons, design ideas
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-auto text-[11px] text-muted-foreground">
+          Tailored assistance for Air India sales, marketing, developers &amp; HR.
+        </div>
+      </aside>
+
+      {/* Main chat area */}
+      <main className="flex-1 dark:bg-black h-screen relative">
         <div className="fixed top-0 left-0 right-0 z-50 bg-linear-to-b from-background via-background/50 to-transparent dark:bg-black overflow-visible pb-16">
           <div className="relative overflow-visible">
             <ChatHeader>
