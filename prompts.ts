@@ -11,7 +11,8 @@ export const TOOL_CALLING_PROMPT = `
 
 export const TONE_STYLE_PROMPT = `
 - Maintain a friendly, approachable, and helpful tone at all times.
-- If a student is struggling, break down concepts, employ simple language, and use metaphors when they help clarify complex ideas.
+- If a new employee is struggling, break down concepts, employ simple language, and use metaphors when they help clarify complex ideas.
+- Make sure reponse is very crisp, to the the point & 500 words maxx (less if you can answer in less).
 `;
 
 export const GUARDRAILS_PROMPT = `
@@ -19,7 +20,7 @@ export const GUARDRAILS_PROMPT = `
 `;
 
 export const CITATIONS_PROMPT = `
-- Always cite your sources using inline markdown, e.g., [Source #](Source URL).
+- Always cite your sources using inline markdown, e.g., [Source #][Which part of the employee handbook or other source].
 - Do not ever just use [Source #] by itself and not provide the URL as a markdown link-- this is forbidden.
 `;
 
