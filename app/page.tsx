@@ -23,6 +23,7 @@ import { useEffect, useState, useRef } from "react";
 import { AI_NAME, CLEAR_CHAT_TEXT, OWNER_NAME, WELCOME_MESSAGE } from "@/config";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   message: z
@@ -66,7 +67,9 @@ const saveMessagesToStorage = (messages: UIMessage[], durations: Record<string, 
 };
 
 export default function Chat() {
+  const router = useRouter();
   const [isClient, setIsClient] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [durations, setDurations] = useState<Record<string, number>>({});
   const welcomeMessageShownRef = useRef<boolean>(false);
   const [selectedHead, setSelectedHead] = useState<string>(
@@ -82,10 +85,20 @@ export default function Chat() {
     messages: initialMessages,
   });
 
+  // Check authentication on mount
   useEffect(() => {
-    setIsClient(true);
-    setDurations(stored.durations);
-    setMessages(stored.messages);
+    if (typeof window !== "undefined") {
+      const authStatus = sessionStorage.getItem("isAuthenticated");
+      if (authStatus === "true") {
+        setIsAuthenticated(true);
+        setIsClient(true);
+        setDurations(stored.durations);
+        setMessages(stored.messages);
+      } else {
+        router.replace("/login");
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -160,6 +173,15 @@ export default function Chat() {
     setSelectedHead(head);
     // keep user on same chat page; could add analytics or preset prompts later
   };
+
+  // Show loading state while checking authentication
+  if (!isAuthenticated || !isClient) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen items-stretch font-sans dark:bg-black">
