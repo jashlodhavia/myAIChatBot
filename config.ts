@@ -45,3 +45,9 @@ export const MODERATION_DENIAL_MESSAGE_DEFAULT = "Your message violates our guid
 
 export const PINECONE_TOP_K = 40;
 export const PINECONE_INDEX_NAME = "my-ai";
+
+// Feature flags / access control
+// Set to false to block access to Air India financials sources globally.
+export const CAN_ACCESS_AIR_INDIA_FINANCIALS = true;
+export const FINANCIALS_ACCESS_DENIAL_MESSAGE =
+  "Sorry you dont have access to this data";
