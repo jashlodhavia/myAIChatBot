@@ -72,6 +72,8 @@ export default function Chat() {
   const [selectedHead, setSelectedHead] = useState<string>(
     "Sales Process Queries",
   );
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const stored = typeof window !== 'undefined' ? loadMessagesFromStorage() : { messages: [], durations: {} };
   const [initialMessages] = useState<UIMessage[]>(stored.messages);
@@ -128,6 +130,10 @@ export default function Chat() {
   function onSubmit(data: z.infer<typeof formSchema>) {
     sendMessage({ text: data.message });
     form.reset();
+    setAttachedFiles([]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   }
 
   function clearChat() {
@@ -138,6 +144,17 @@ export default function Chat() {
     saveMessagesToStorage(newMessages, newDurations);
     toast.success("Chat cleared");
   }
+
+  const handleFileButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    setAttachedFiles(Array.from(files));
+    // TODO: hook upload endpoint here and include uploaded URLs in chat payload.
+  };
 
   const handleSidebarClick = (head: string) => {
     setSelectedHead(head);
@@ -198,7 +215,7 @@ export default function Chat() {
           </div>
         </div>
 
-        <div className="mt-auto text-[11px] text-muted-foreground">
+        <div className="mt-auto text-[11px] text-foreground/80">
           Tailored assistance for Air India sales, marketing, developers &amp; HR.
         </div>
       </aside>
@@ -245,17 +262,21 @@ export default function Chat() {
                     </h2>
                   </div>
                 </div>
-                <MessageWall
-                  messages={messages}
-                  status={status}
-                  durations={durations}
-                  onDurationChange={handleDurationChange}
-                />
-                {status === "submitted" && (
-                  <div className="flex justify-start max-w-3xl w-full">
-                    <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                <div className="w-full flex justify-center">
+                  <div className="max-w-3xl w-full">
+                    <MessageWall
+                      messages={messages}
+                      status={status}
+                      durations={durations}
+                      onDurationChange={handleDurationChange}
+                    />
+                    {status === "submitted" && (
+                      <div className="flex justify-start w-full">
+                        <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </>
             ) : (
               <div className="flex justify-center max-w-2xl w-full">
@@ -278,11 +299,28 @@ export default function Chat() {
                         <FieldLabel htmlFor="chat-form-message" className="sr-only">
                           Message
                         </FieldLabel>
-                        <div className="relative h-13">
+                        <div className="relative h-13 flex items-center">
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            className="hidden"
+                            onChange={handleFileChange}
+                          />
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="outline"
+                            className="absolute left-2 top-2 z-10 rounded-full bg-card border-input"
+                            onClick={handleFileButtonClick}
+                          >
+                            <PlusIcon className="size-4" />
+                          </Button>
                           <Input
                             {...field}
                             id="chat-form-message"
-                            className="h-15 pr-15 pl-5 bg-card rounded-[20px]"
+                            className="h-15 pr-15 pl-11 bg-card rounded-[20px]"
                             placeholder="Type your message here..."
                             disabled={status === "streaming"}
                             aria-invalid={fieldState.invalid}
