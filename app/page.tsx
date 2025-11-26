@@ -205,7 +205,7 @@ export default function Chat() {
 
       {/* Main chat area */}
       <main className="flex-1 dark:bg-black h-screen relative">
-        <div className="fixed top-0 left-0 right-0 z-50 bg-linear-to-b from-background via-background/50 to-transparent dark:bg-black overflow-visible pb-16">
+        <div className="fixed top-0 left-0 right-0 md:left-72 z-50 bg-linear-to-b from-background via-background/50 to-transparent dark:bg-black overflow-visible pb-16">
           <div className="relative overflow-visible">
             <ChatHeader>
               <ChatHeaderBlock />
