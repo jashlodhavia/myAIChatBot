@@ -69,6 +69,9 @@ export default function Chat() {
   const [isClient, setIsClient] = useState(false);
   const [durations, setDurations] = useState<Record<string, number>>({});
   const welcomeMessageShownRef = useRef<boolean>(false);
+  const [selectedHead, setSelectedHead] = useState<string>(
+    "Sales Process Queries",
+  );
 
   const stored = typeof window !== 'undefined' ? loadMessagesFromStorage() : { messages: [], durations: {} };
   const [initialMessages] = useState<UIMessage[]>(stored.messages);
@@ -136,40 +139,61 @@ export default function Chat() {
     toast.success("Chat cleared");
   }
 
+  const handleSidebarClick = (head: string) => {
+    setSelectedHead(head);
+    // keep user on same chat page; could add analytics or preset prompts later
+  };
+
   return (
     <div className="flex h-screen items-stretch font-sans dark:bg-black">
       {/* Left sidebar */}
       <aside className="hidden md:flex flex-col w-72 border-r bg-sidebar text-sidebar-foreground px-6 py-6 gap-8">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-foreground/70">
             Process
           </p>
           <div className="mt-3 space-y-2 text-sm">
-            <button className="w-full text-left px-3 py-2 rounded-xl bg-card hover:bg-primary hover:text-primary-foreground transition-colors shadow-sm">
+            <button
+              className={`w-full text-left px-3 py-2 rounded-xl transition-colors shadow-sm ${
+                selectedHead === "Sales Process Queries"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card hover:bg-secondary"
+              }`}
+              onClick={() => handleSidebarClick("Sales Process Queries")}
+            >
               Sales Process Queries
             </button>
-            <button className="w-full text-left px-3 py-2 rounded-xl hover:bg-secondary transition-colors">
+            <button
+              className={`w-full text-left px-3 py-2 rounded-xl transition-colors ${
+                selectedHead === "Marketing Queries"
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-secondary"
+              }`}
+              onClick={() => handleSidebarClick("Marketing Queries")}
+            >
               Marketing Queries
             </button>
-            <button className="w-full text-left px-3 py-2 rounded-xl hover:bg-secondary transition-colors">
+            <button
+              className={`w-full text-left px-3 py-2 rounded-xl transition-colors ${
+                selectedHead === "Developer Queries about Codebase"
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-secondary"
+              }`}
+              onClick={() =>
+                handleSidebarClick("Developer Queries about Codebase")
+              }
+            >
               Developer Queries about Codebase
             </button>
-            <button className="w-full text-left px-3 py-2 rounded-xl hover:bg-secondary transition-colors">
+            <button
+              className={`w-full text-left px-3 py-2 rounded-xl transition-colors ${
+                selectedHead === "Employee & HR Query"
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-secondary"
+              }`}
+              onClick={() => handleSidebarClick("Employee & HR Query")}
+            >
               Employee &amp; HR Query
-            </button>
-          </div>
-        </div>
-
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Image
-          </p>
-          <div className="mt-3 space-y-2 text-sm">
-            <button className="w-full text-left px-3 py-2 rounded-xl hover:bg-secondary transition-colors">
-              Creative as per Guidelines
-            </button>
-            <button className="w-full text-left px-3 py-2 rounded-xl hover:bg-secondary transition-colors">
-              PPT creatives, icons, design ideas
             </button>
           </div>
         </div>
@@ -214,7 +238,19 @@ export default function Chat() {
           <div className="flex flex-col items-center justify-end min-h-full">
             {isClient ? (
               <>
-                <MessageWall messages={messages} status={status} durations={durations} onDurationChange={handleDurationChange} />
+                <div className="w-full flex justify-center mb-4">
+                  <div className="max-w-3xl w-full">
+                    <h2 className="text-xl font-semibold tracking-tight">
+                      {selectedHead}
+                    </h2>
+                  </div>
+                </div>
+                <MessageWall
+                  messages={messages}
+                  status={status}
+                  durations={durations}
+                  onDurationChange={handleDurationChange}
+                />
                 {status === "submitted" && (
                   <div className="flex justify-start max-w-3xl w-full">
                     <Loader2 className="size-4 animate-spin text-muted-foreground" />
