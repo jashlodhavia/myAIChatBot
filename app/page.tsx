@@ -263,7 +263,7 @@ export default function Chat() {
                   </div>
                 </div>
                 <div className="w-full flex justify-center">
-                  <div className="max-w-3xl w-full">
+                  <div className="max-w-3xl w-full pl-11">
                     <MessageWall
                       messages={messages}
                       status={status}
