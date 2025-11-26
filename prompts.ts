@@ -26,6 +26,15 @@ export const CITATIONS_PROMPT = `
 
 export const COURSE_CONTEXT_PROMPT = `
 - Most basic questions about the course can be answered by reading the syllabus.
+-
+- When you answer using information retrieved from the internal vector database (Pinecone) via the \`vectorDatabaseSearch\` tool, you MUST start your reply with the exact sentence:
+- "Search internal SOP and documents"
+-
+- When you answer primarily using the \`webSearch\` tool or your own model knowledge (and there is no sufficiently relevant internal SOP / document), you MUST start your reply with the exact sentence:
+- "Sorry there are no Air India Official doc for your query, but this is an answer from other sources from web"
+-
+- If you use BOTH internal documents and the web, treat the answer as coming from internal documents and still start with:
+- "Search internal SOP and documents"
 `;
 
 export const SYSTEM_PROMPT = `
