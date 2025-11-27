@@ -196,7 +196,7 @@ export default function Chat() {
   return (
     <div className="flex h-screen items-stretch font-sans dark:bg-black">
       {/* Left sidebar */}
-      <aside className="hidden md:flex flex-col w-72 border-r bg-sidebar text-sidebar-foreground px-6 py-6 gap-8">
+      <aside className="hidden md:flex flex-col w-72 border-r bg-gradient-to-b from-[#FFF6F6] via-[#FFE5E5] to-[#FFCFCF] text-[#5B0A0E] px-6 py-6 gap-8">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-foreground">
             Chat History
@@ -210,7 +210,7 @@ export default function Chat() {
                   return (
                     <div
                       key={message.id}
-                      className="w-full rounded-xl bg-card px-3 py-2 shadow-sm"
+                      className="w-full rounded-2xl border border-[#f7b6b4] bg-gradient-to-br from-[#FFEAEA] to-[#FFD1D1] px-4 py-3 text-[#5B0A0E] shadow-[0_12px_30px_rgba(199,34,42,0.12)]"
                     >
                       <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
                         {message.role === "user" ? "You" : AI_NAME}
@@ -222,7 +222,7 @@ export default function Chat() {
                   );
                 })
             ) : (
-              <div className="rounded-xl border border-dashed border-muted-foreground/40 px-3 py-6 text-center text-xs text-muted-foreground">
+              <div className="rounded-2xl border border-dashed border-[#f5b3b3]/60 bg-white/60 px-4 py-6 text-center text-xs text-[#7a141c]">
                 Start chatting to build your history. Messages automatically
                 stay here thanks to local storage.
               </div>
@@ -335,7 +335,7 @@ export default function Chat() {
                           <Input
                             {...field}
                             id="chat-form-message"
-                            className="h-15 pr-15 pl-11 bg-card rounded-[20px]"
+                            className="h-15 pr-15 pl-11 rounded-[20px] border-2 border-[#C7222A] bg-card focus:border-[#A91B20]"
                             placeholder="Type your message here..."
                             disabled={status === "streaming"}
                             aria-invalid={fieldState.invalid}
