@@ -146,8 +146,15 @@ export default function LoginPage() {
           </p>
           <p className="text-lg font-semibold text-[#5B0A0E]">Onboardly</p>
         </div>
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-dashed border-[#7A141C]/30 bg-white/40 text-[10px] uppercase tracking-[0.4em] text-[#7A141C]/40">
-          Logo
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/70 bg-white/80 shadow-lg">
+          <Image
+            src="/onboarding.png"
+            alt="Onboardly logo"
+            width={48}
+            height={48}
+            className="h-10 w-10 object-contain"
+            priority
+          />
         </div>
       </div>
     </div>

@@ -26,9 +26,11 @@ export default function Terms() {
             </p>
             <h1 className="mt-3 text-3xl font-semibold">MyAI3 Terms</h1>
             <p className="mt-4 text-sm leading-relaxed text-[#7A141C]/80">
-              These terms describe how you may interact with AirIndiaGuide.AI, a
-              secure onboarding buddy crafted by {OWNER_NAME}. Please read carefully before
-              continuing.
+              These terms describe how you may interact with AirIndiaGuide.AI, an
+              experimental employee onboarding concierge crafted by {OWNER_NAME}. It is
+              trained on replicated, synthetic (FAKE) data that merely imitates
+              Air India–style documents, SOPs and codebases – it does not use real
+              internal data. Please read carefully before continuing.
             </p>
             <div className="mt-6 rounded-2xl border border-white/70 bg-white/70 px-5 py-4 text-sm font-semibold text-[#A2131A] shadow-inner">
               Last updated: November 17, 2025
@@ -43,8 +45,9 @@ export default function Terms() {
             </h2>
             <p>
               The following terms govern access to and use of the MyAI3 Assistant
-              (&quot;AI Chatbot&quot;), an AI tool provided by {OWNER_NAME} (&quot;I&quot;, &quot;me&quot;, or
-              &quot;myself&quot;). By engaging with the AI Chatbot, you agree to these terms.
+              (&quot;AI Chatbot&quot;), an AI-powered employee onboarding concierge provided
+              by {OWNER_NAME} (&quot;I&quot;, &quot;me&quot;, or &quot;myself&quot;). By engaging with the AI
+              Chatbot, you agree to these terms.
             </p>
           </section>
 
@@ -52,45 +55,49 @@ export default function Terms() {
             <TermBlock
               title="General Information"
               items={[
-                `Provider and Purpose: The AI Chatbot is developed and maintained by ${OWNER_NAME}. It assists with onboarding and enablement queries and is not affiliated with any airline regulator.`,
-                "Third-Party Involvement: Responses may leverage third-party infrastructure outside your region; confidentiality and privacy cannot be guaranteed.",
-                "No Guarantee of Accuracy: Answers may be incomplete or outdated. Verify before making decisions.",
+                `Provider and Purpose: The AI Chatbot is developed and maintained by ${OWNER_NAME}. It is intended to assist with generic, educational onboarding-style queries (for example, how policies, SOPs, or codebases might work in a typical airline-like setup).`,
+                "Not Official Air India Tool: The AI Chatbot is NOT developed by, endorsed by, or affiliated with Air India, the Tata Group, or any of their subsidiaries, regulators, or partners. Any reference to Air India is purely illustrative.",
+                "Synthetic / Fake Training Data: The AI Chatbot is trained on replicated FAKE / synthetic data that imitates documents, SOPs and codebases of an airline. It does NOT access or expose real Air India systems, real company documents, or actual employee records.",
+                "No Guarantee of Accuracy: All answers are generated and may be incomplete, approximate, outdated, or incorrect. They do not represent official HR, legal, IT, finance, security, or operational guidance. Always verify with your organisation’s official policies, portals and HR/manager before acting.",
               ]}
             />
 
             <TermBlock
               title="Liability"
               items={[
-                "Use at Your Own Risk: Provided “as-is” and “as-available.” All warranties are disclaimed to the fullest extent allowed.",
-                "No Responsibility for Damages: Neither the owner nor collaborators are liable for direct or indirect damages stemming from usage.",
-                "Modification or Discontinuation: Features may change or be withdrawn at any time without notice.",
-                "Future Fees: Paid plans may be introduced in the future without prior notice.",
+                "Use at Your Own Risk: The AI Chatbot is provided on an “as-is” and “as-available” basis. All warranties (express or implied), including accuracy, fitness for a particular purpose and non-infringement, are disclaimed to the maximum extent permitted by law.",
+                "No Responsibility for Damages: Neither the owner nor any collaborators will be liable for direct, indirect, incidental, consequential, special, or exemplary damages arising out of or in connection with the use of (or inability to use) the AI Chatbot.",
+                "No Employment or Contractual Rights: Outputs from the AI Chatbot do not create or modify any employment contract, policy, benefit, entitlement, or right. Your actual employment terms and conditions are governed solely by your employer and its official documentation.",
+                "Modification or Discontinuation: Features, access, or the entire service may be changed, suspended, or discontinued at any time without notice.",
+                "Future Fees: Paid plans or usage-based fees may be introduced in the future without prior notice. Continued use after such changes will be treated as acceptance of the updated commercial terms.",
               ]}
             />
 
             <TermBlock
               title="User Responsibilities"
               items={[
-                "Eligibility: You must be 18+ to use the AI Chatbot.",
-                "Prohibited Conduct: Do not post defamatory, illegal, hateful, or obscene material, tamper with system security, or reverse engineer the service.",
+                "Eligibility: You must be 18+ to use the AI Chatbot, or the age of majority in your jurisdiction, whichever is higher.",
+                "No Confidential or Personal Data: Do NOT enter real confidential business information (e.g., customer data, passenger PNRs, financials, trade secrets), sensitive personal data, or security credentials. Treat the chatbot as a public tool for generic learning only.",
+                "Prohibited Conduct: You agree not to upload or generate defamatory, illegal, hateful, or obscene material; attempt to circumvent or probe security; or reverse engineer, scrape, or misuse the service in any way.",
+                "Human Oversight: You are responsible for applying judgment and confirming information with your organisation’s official sources (HR, IT, Finance, Legal, etc.) before relying on any output from the AI Chatbot.",
               ]}
             />
 
             <TermBlock
               title="Data Privacy and Security"
               items={[
-                "No Privacy Guarantee: Inputs and outputs may be reviewed to improve AI quality and training.",
-                "Public Information: Treat your prompts as non-confidential.",
-                "Data Transmission: Content may transit through external vendors and APIs.",
+                "No Privacy Guarantee: Prompts, feedback and outputs may be logged, stored and reviewed to improve AI quality, safety, and performance. Do not share anything you would not be comfortable treating as non-confidential.",
+                "Public / Non-Confidential Treatment: You should assume that anything you type into the AI Chatbot is non-confidential. Do not use it to transmit secrets, proprietary code, or personal employee data.",
+                "Third-Party Infrastructure: The service may run on third-party infrastructure, APIs and cloud providers that can be located outside your country or region. While reasonable technical and organisational measures may be used, absolute security cannot be guaranteed.",
               ]}
             />
 
             <TermBlock
               title="Ownership & Commercial Use"
               items={[
-                `Surrender of Rights: All inputs and outputs become the property of ${OWNER_NAME}.`,
-                "Commercial / Research Use: Content may be reused for research, onboarding improvements, or other initiatives.",
-                "No Claim to Gains: Users waive rights to profits derived from submitted content.",
+                `Your Inputs: You remain responsible for any content you submit. By using the AI Chatbot, you grant ${OWNER_NAME} a worldwide, non-exclusive, royalty-free licence to use your inputs (and generated outputs) to operate, maintain, improve, research and develop the service.`,
+                "AI Outputs: Outputs are generated content and may be reused, analysed, or aggregated for research, product improvement, demos and other projects, subject to applicable law.",
+                "No Claim to Gains: You understand and agree that you will not have any claim to profits, products, or commercial gains that may arise, directly or indirectly, from the use of your prompts or the AI outputs.",
               ]}
             />
 
@@ -99,8 +106,10 @@ export default function Terms() {
                 Indemnification
               </h3>
               <p>
-                By using the AI Chatbot, you agree to indemnify and hold harmless {OWNER_NAME},
-                collaborators, and partners from claims arising from your use or violation of these terms.
+                By using the AI Chatbot, you agree to indemnify, defend, and hold harmless {OWNER_NAME},
+                and any collaborators or partners, from and against all claims, liabilities, damages,
+                losses, costs and expenses (including reasonable legal fees) arising out of or related to
+                your use of the AI Chatbot, your content, or your violation of these terms.
               </p>
             </section>
 
@@ -109,8 +118,10 @@ export default function Terms() {
                 Governing Law
               </h3>
               <p>
-                These terms follow the laws of North Carolina, USA. Additional jurisdictions may apply for
-                international users, but any disputes will be heard in North Carolina courts where permitted.
+                These terms are governed by and construed in accordance with the laws of India, without
+                regard to its conflict of law principles. Where permitted, any disputes will be subject to
+                the exclusive jurisdiction of the courts in India. If you are accessing the AI Chatbot from
+                another country, you are responsible for complying with local laws where applicable.
               </p>
             </section>
 
@@ -119,8 +130,9 @@ export default function Terms() {
                 Acceptance of Terms
               </h3>
               <p>
-                Continuing to use the AI Chatbot confirms you have read and agreed to these Terms of Use. If
-                you disagree with any section, discontinue use immediately.
+                By continuing to use the AI Chatbot, you confirm that you have read, understood, and agreed
+                to these Terms of Use. If you do not agree with any part of these terms, you must stop using
+                the AI Chatbot immediately.
               </p>
             </section>
           </div>

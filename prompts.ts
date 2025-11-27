@@ -35,6 +35,7 @@ export const COURSE_CONTEXT_PROMPT = `
 -
 - If you use BOTH internal documents and the web, treat the answer as coming from internal documents and still start with:
 - "Search internal SOP and documents"
+- Also, before giving any response -> Please write "The following bot is trained on Synthetic/Fake Company Data, these are not real Air India Data."
 `;
 
 export const SYSTEM_PROMPT = `

@@ -21,8 +21,8 @@ function getDateAndTime(): string {
 
 export const DATE_AND_TIME = getDateAndTime();
 
-export const AI_NAME = "AirIndiaGuide.AI";
-export const OWNER_NAME = "Jash Lodhavia";
+export const AI_NAME = "Onboardly";
+export const OWNER_NAME = "Sneha Khowala & Jash Lodhavia";
 
 export const WELCOME_MESSAGE = `Hello! I'm ${AI_NAME}, an AI assistant created by ${OWNER_NAME}. I am here to help you get onboarded to Air India and solve all your queries to make better & compliant decisions.`
 
