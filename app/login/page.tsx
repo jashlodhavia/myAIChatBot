@@ -135,6 +135,10 @@ export default function LoginPage() {
                 </div>
               )}
 
+              <div className="rounded-2xl border border-[#7A141C]/30 bg-[#7A141C]/10 px-4 py-3 text-center text-sm text-[#7A141C]/90">
+                <p className="font-medium">Use username = employee and password = test</p>
+              </div>
+
               <Button
                 type="submit"
                 disabled={isLoading}
