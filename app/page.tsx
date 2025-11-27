@@ -32,15 +32,18 @@ const formSchema = z.object({
     .max(2000, "Message must be at most 2000 characters."),
 });
 
-const STORAGE_KEY = 'chat-messages';
+const STORAGE_KEY = "chat-messages";
 
 type StorageData = {
   messages: UIMessage[];
   durations: Record<string, number>;
 };
 
-const loadMessagesFromStorage = (): { messages: UIMessage[]; durations: Record<string, number> } => {
-  if (typeof window === 'undefined') return { messages: [], durations: {} };
+const loadMessagesFromStorage = (): {
+  messages: UIMessage[];
+  durations: Record<string, number>;
+} => {
+  if (typeof window === "undefined") return { messages: [], durations: {} };
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return { messages: [], durations: {} };
@@ -56,8 +59,11 @@ const loadMessagesFromStorage = (): { messages: UIMessage[]; durations: Record<s
   }
 };
 
-const saveMessagesToStorage = (messages: UIMessage[], durations: Record<string, number>) => {
-  if (typeof window === 'undefined') return;
+const saveMessagesToStorage = (
+  messages: UIMessage[],
+  durations: Record<string, number>,
+) => {
+  if (typeof window === "undefined") return;
   try {
     const data: StorageData = { messages, durations };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -66,19 +72,28 @@ const saveMessagesToStorage = (messages: UIMessage[], durations: Record<string, 
   }
 };
 
+const getMessagePreview = (message: UIMessage) => {
+  const textPart = message.parts.find(
+    (part): part is { type: "text"; text: string } => part.type === "text",
+  );
+  if (!textPart) return "";
+  const preview = textPart.text.trim().replace(/\s+/g, " ");
+  return preview.length > 80 ? `${preview.slice(0, 77)}...` : preview;
+};
+
 export default function Chat() {
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [durations, setDurations] = useState<Record<string, number>>({});
   const welcomeMessageShownRef = useRef<boolean>(false);
-  const [selectedHead, setSelectedHead] = useState<string>(
-    "Sales Process Queries",
-  );
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const stored = typeof window !== 'undefined' ? loadMessagesFromStorage() : { messages: [], durations: {} };
+  const stored =
+    typeof window !== "undefined"
+      ? loadMessagesFromStorage()
+      : { messages: [], durations: {} };
   const [initialMessages] = useState<UIMessage[]>(stored.messages);
 
   const { messages, sendMessage, status, stop, setMessages } = useChat({
@@ -169,11 +184,6 @@ export default function Chat() {
     // TODO: hook upload endpoint here and include uploaded URLs in chat payload.
   };
 
-  const handleSidebarClick = (head: string) => {
-    setSelectedHead(head);
-    // keep user on same chat page; could add analytics or preset prompts later
-  };
-
   // Show loading state while checking authentication
   if (!isAuthenticated || !isClient) {
     return (
@@ -189,51 +199,34 @@ export default function Chat() {
       <aside className="hidden md:flex flex-col w-72 border-r bg-sidebar text-sidebar-foreground px-6 py-6 gap-8">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-foreground">
-            Process
+            Chat History
           </p>
           <div className="mt-3 space-y-2 text-sm">
-            <button
-              className={`w-full text-left px-3 py-2 rounded-xl transition-colors shadow-sm cursor-pointer ${
-                selectedHead === "Sales Process Queries"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card hover:bg-secondary"
-              }`}
-              onClick={() => handleSidebarClick("Sales Process Queries")}
-            >
-              Sales Process Queries
-            </button>
-            <button
-              className={`w-full text-left px-3 py-2 rounded-xl transition-colors cursor-pointer ${
-                selectedHead === "Marketing Queries"
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-secondary"
-              }`}
-              onClick={() => handleSidebarClick("Marketing Queries")}
-            >
-              Marketing Queries
-            </button>
-            <button
-              className={`w-full text-left px-3 py-2 rounded-xl transition-colors cursor-pointer ${
-                selectedHead === "Developer Queries about Codebase"
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-secondary"
-              }`}
-              onClick={() =>
-                handleSidebarClick("Developer Queries about Codebase")
-              }
-            >
-              Developer Queries about Codebase
-            </button>
-            <button
-              className={`w-full text-left px-3 py-2 rounded-xl transition-colors cursor-pointer ${
-                selectedHead === "Employee & HR Query"
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-secondary"
-              }`}
-              onClick={() => handleSidebarClick("Employee & HR Query")}
-            >
-              Employee &amp; HR Query
-            </button>
+            {isClient && messages.length > 0 ? (
+              [...messages]
+                .reverse()
+                .map((message) => {
+                  const preview = getMessagePreview(message);
+                  return (
+                    <div
+                      key={message.id}
+                      className="w-full rounded-xl bg-card px-3 py-2 shadow-sm"
+                    >
+                      <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                        {message.role === "user" ? "You" : AI_NAME}
+                      </p>
+                      <p className="truncate text-sm text-foreground">
+                        {preview || "Attachment"}
+                      </p>
+                    </div>
+                  );
+                })
+            ) : (
+              <div className="rounded-xl border border-dashed border-muted-foreground/40 px-3 py-6 text-center text-xs text-muted-foreground">
+                Start chatting to build your history. Messages automatically
+                stay here thanks to local storage.
+              </div>
+            )}
           </div>
         </div>
 
@@ -279,8 +272,8 @@ export default function Chat() {
               <>
                 <div className="w-full flex justify-center mb-4">
                   <div className="max-w-3xl w-full">
-                    <h2 className="text-xl font-semibold tracking-tight pl-11">
-                      {selectedHead}
+                    <h2 className="pl-11 text-xl font-semibold tracking-tight">
+                      Conversation
                     </h2>
                   </div>
                 </div>
