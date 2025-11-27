@@ -52,7 +52,7 @@ export function AnswerCard({
           </div>
           <StreamingIndicator isStreaming={isStreaming} />
         </div>
-        <div className="rounded-3xl bg-white/50 p-4 text-base leading-relaxed text-[#3D0C12] shadow-inner">
+        <div className="rounded-3xl bg-white/60 p-4 text-base leading-relaxed text-[#3D0C12] shadow-inner transition duration-200 hover:bg-white">
           {children}
         </div>
         <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.5em] text-[#7A141C]/60">
