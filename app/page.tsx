@@ -19,7 +19,7 @@ import { ChatHeader } from "@/app/parts/chat-header";
 import { ChatHeaderBlock } from "@/app/parts/chat-header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UIMessage } from "ai";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AI_NAME, CLEAR_CHAT_TEXT, OWNER_NAME, WELCOME_MESSAGE } from "@/config";
 import Image from "next/image";
 import Link from "next/link";
@@ -138,8 +138,8 @@ const loadSessionsFromStorage = (): ChatSession[] => {
           id: `session-${Date.now()}`,
           title: "General Assistance",
           createdAt: Date.now(),
-          messages: parsed.messages || [],
-          durations: parsed.durations || {},
+      messages: parsed.messages || [],
+      durations: parsed.durations || {},
         },
       ];
     }
@@ -243,33 +243,26 @@ export default function Chat() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateSessions = useCallback(
-    (nextSessions: ChatSession[]) => {
-      const limited = enforceSessionLimit(nextSessions, activeSessionId);
-      setSessions(limited);
-      saveSessionsToStorage(limited);
-    },
-    [activeSessionId],
-  );
-
   useEffect(() => {
     if (!isClient || !activeSessionId) return;
-    updateSessions(
-      sessions.map((session) => {
+    setSessions((prevSessions) => {
+      const nextSessions = prevSessions.map((session) => {
         if (session.id !== activeSessionId) return session;
-        const updated = {
+        const updatedSession = {
           ...session,
           messages,
           durations,
         };
-        const newTitle = generateSessionTitle(messages, session.createdAt);
-        if (newTitle !== session.title) {
-          updated.title = newTitle;
+        const nextTitle = generateSessionTitle(messages, session.createdAt);
+        if (nextTitle !== session.title) {
+          updatedSession.title = nextTitle;
         }
-        return updated;
-      }),
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        return updatedSession;
+      });
+      const limited = enforceSessionLimit(nextSessions, activeSessionId);
+      saveSessionsToStorage(limited);
+      return limited;
+    });
   }, [messages, durations, isClient, activeSessionId]);
 
   const handleDurationChange = (key: string, duration: number) => {
@@ -302,7 +295,12 @@ export default function Chat() {
     setActiveSessionId(newSession.id);
     setDurations({});
     setMessages(welcomeMessages);
-    updateSessions([newSession, ...sessions]);
+    setSessions((prevSessions) => {
+      const nextSessions = [newSession, ...prevSessions];
+      const limited = enforceSessionLimit(nextSessions, newSession.id);
+      saveSessionsToStorage(limited);
+      return limited;
+    });
     toast.success("Started a new chat");
   };
 
@@ -332,7 +330,8 @@ export default function Chat() {
     setMessages(selectedSession.messages || []);
   };
 
-  const displayedSessions = sessions
+  const displayedSessions = [...sessions]
+    .sort((a, b) => b.createdAt - a.createdAt)
     .filter((session) => session.id === activeSessionId || isMeaningfulSession(session))
     .slice(0, MAX_SESSIONS);
 
@@ -356,7 +355,7 @@ export default function Chat() {
           <div className="mt-3 space-y-2 text-sm">
             {isClient && displayedSessions.length > 0 ? (
               displayedSessions.map((session) => (
-                <button
+            <button
                   type="button"
                   onClick={() => handleSessionSelect(session.id)}
                   key={session.id}
@@ -372,7 +371,7 @@ export default function Chat() {
                   <p className="truncate text-sm text-[#5B0A0E]">
                     {getSessionPreview(session)}
                   </p>
-                </button>
+            </button>
               ))
             ) : (
               <div className="rounded-2xl border border-dashed border-[#f5b3b3]/60 bg-white/60 px-4 py-6 text-center text-xs text-[#7a141c]">
