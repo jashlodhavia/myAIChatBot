@@ -2,6 +2,7 @@ import { UIMessage, ToolCallPart, ToolResultPart } from "ai";
 import { Response } from "@/components/ai-elements/response";
 import { ReasoningPart } from "./reasoning-part";
 import { ToolCall, ToolResult } from "./tool-call";
+import { AnswerCard } from "@/components/ai-elements/answer-card";
 
 export function AssistantMessage({ message, status, isLastMessage, durations, onDurationChange }: { message: UIMessage; status?: string; isLastMessage?: boolean; durations?: Record<string, number>; onDurationChange?: (key: string, duration: number) => void }) {
     return (
@@ -13,7 +14,13 @@ export function AssistantMessage({ message, status, isLastMessage, durations, on
                     const duration = durations?.[durationKey];
 
                     if (part.type === "text") {
-                        return <Response key={`${message.id}-${i}`}>{part.text}</Response>;
+                        return (
+                            <AnswerCard key={`${message.id}-${i}`} isStreaming={isStreaming}>
+                                <Response className="prose prose-neutral max-w-none text-base leading-relaxed sm:text-lg">
+                                    {part.text}
+                                </Response>
+                            </AnswerCard>
+                        );
                     } else if (part.type === "reasoning") {
                         return (
                             <ReasoningPart
