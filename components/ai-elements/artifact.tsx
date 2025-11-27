@@ -10,6 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import { type LucideIcon, XIcon } from "lucide-react";
 import type { ComponentProps, HTMLAttributes } from "react";
+import { Tool } from "./tool";
 
 export type ArtifactProps = HTMLAttributes<HTMLDivElement>;
 
@@ -133,7 +134,6 @@ export const ArtifactAction = ({
       </TooltipProvider>
     );
   }
-
   return button;
 };
 
