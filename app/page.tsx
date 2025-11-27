@@ -210,7 +210,7 @@ export default function Chat() {
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
 
   const { messages, sendMessage, status, stop, setMessages } = useChat({
-    messages: [],
+    messages: [] as UIMessage[],
   });
 
   // Check authentication on mount
