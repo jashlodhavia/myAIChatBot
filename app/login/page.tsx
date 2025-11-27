@@ -19,17 +19,25 @@ export default function LoginPage() {
     setError("");
     setIsLoading(true);
 
-    // Simple authentication check
-    if (username === "test" && password === "test") {
-      // Store auth state
+    const normalizedUser = username.trim().toLowerCase();
+    const credentials = {
+      employee: "test",
+      ceo: "test",
+    } as const;
+
+    if (credentials[normalizedUser as keyof typeof credentials] === password) {
       if (typeof window !== "undefined") {
         sessionStorage.setItem("isAuthenticated", "true");
-        sessionStorage.setItem("username", username);
+        sessionStorage.setItem("username", normalizedUser);
+        sessionStorage.setItem("role", normalizedUser === "ceo" ? "ceo" : "employee");
       }
-      // Redirect to chat page
       router.push("/");
     } else {
-      setError("Invalid username or password");
+      setError(
+        normalizedUser === "employee" || normalizedUser === "ceo"
+          ? "Incorrect password."
+          : "Invalid username or password",
+      );
       setIsLoading(false);
     }
   };
