@@ -19,7 +19,7 @@ import { ChatHeader } from "@/app/parts/chat-header";
 import { ChatHeaderBlock } from "@/app/parts/chat-header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UIMessage } from "ai";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { AI_NAME, CLEAR_CHAT_TEXT, OWNER_NAME, WELCOME_MESSAGE } from "@/config";
 import Image from "next/image";
 import Link from "next/link";
@@ -32,53 +32,171 @@ const formSchema = z.object({
     .max(2000, "Message must be at most 2000 characters."),
 });
 
-const STORAGE_KEY = "chat-messages";
+const STORAGE_KEY = "chat-sessions";
+const MAX_SESSIONS = 5;
 
-type StorageData = {
+type ChatSession = {
+  id: string;
+  title: string;
+  createdAt: number;
   messages: UIMessage[];
   durations: Record<string, number>;
 };
 
-const loadMessagesFromStorage = (): {
-  messages: UIMessage[];
-  durations: Record<string, number>;
-} => {
-  if (typeof window === "undefined") return { messages: [], durations: {} };
+const getTextFromMessage = (message: UIMessage) => {
+  const part = message.parts.find(
+    (p): p is { type: "text"; text: string } => p.type === "text",
+  );
+  return part?.text?.trim() ?? "";
+};
+
+const isMeaningfulUserMessage = (message: UIMessage) => {
+  if (message.role !== "user") return false;
+  const text = getTextFromMessage(message).toLowerCase();
+  if (text.length < 8) return false;
+  const cleaned = text.replace(/[^a-z0-9\s]/g, "").trim();
+  const trivial = [
+    "hi",
+    "hello",
+    "hey",
+    "hii",
+    "hiii",
+    "sup",
+    "test",
+    "hola",
+    "yo",
+    "ok",
+    "okay",
+  ];
+  return cleaned.length >= 8 && !trivial.includes(cleaned);
+};
+
+const CATEGORY_MAP = [
+  { title: "HR Assistance", keywords: ["leave", "policy", "employee", "hr"] },
+  { title: "Sales Support", keywords: ["sales", "pipeline", "deal", "client"] },
+  { title: "Marketing Strategy", keywords: ["marketing", "campaign", "brand"] },
+  {
+    title: "Developer Guidance",
+    keywords: ["code", "deploy", "bug", "engineer", "api"],
+  },
+  { title: "Operations Help", keywords: ["sop", "process", "workflow"] },
+];
+
+const generateSessionTitle = (messages: UIMessage[], createdAt: number) => {
+  const userContent = messages
+    .filter((message) => message.role === "user")
+    .map((message) => getTextFromMessage(message).toLowerCase())
+    .join(" ");
+
+  const matchedCategory =
+    CATEGORY_MAP.find((category) =>
+      category.keywords.some((keyword) => userContent.includes(keyword)),
+    )?.title ?? "General Assistance";
+
+  const dateLabel = new Date(createdAt).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
+
+  return `${matchedCategory} · ${dateLabel}`;
+};
+
+const createWelcomeMessage = (): UIMessage => ({
+  id: `welcome-${Date.now()}`,
+  role: "assistant",
+  parts: [
+    {
+      type: "text",
+      text: WELCOME_MESSAGE,
+    },
+  ],
+});
+
+const createSession = (messages: UIMessage[] = []): ChatSession => {
+  const createdAt = Date.now();
+  return {
+    id: `session-${createdAt}`,
+    title: generateSessionTitle(messages, createdAt),
+    createdAt,
+    messages,
+    durations: {},
+  };
+};
+
+const loadSessionsFromStorage = (): ChatSession[] => {
+  if (typeof window === "undefined") return [];
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return { messages: [], durations: {} };
-
+    if (!stored) return [];
     const parsed = JSON.parse(stored);
-    return {
-      messages: parsed.messages || [],
-      durations: parsed.durations || {},
-    };
+    if (Array.isArray(parsed.sessions)) {
+      return parsed.sessions;
+    }
+    if (parsed.messages) {
+      return [
+        {
+          id: `session-${Date.now()}`,
+          title: "General Assistance",
+          createdAt: Date.now(),
+          messages: parsed.messages || [],
+          durations: parsed.durations || {},
+        },
+      ];
+    }
+    return [];
   } catch (error) {
-    console.error('Failed to load messages from localStorage:', error);
-    return { messages: [], durations: {} };
+    console.error("Failed to load sessions from localStorage:", error);
+    return [];
   }
 };
 
-const saveMessagesToStorage = (
-  messages: UIMessage[],
-  durations: Record<string, number>,
-) => {
+const saveSessionsToStorage = (sessions: ChatSession[]) => {
   if (typeof window === "undefined") return;
   try {
-    const data: StorageData = { messages, durations };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ sessions }));
   } catch (error) {
-    console.error('Failed to save messages to localStorage:', error);
+    console.error("Failed to save sessions to localStorage:", error);
   }
 };
 
-const getMessagePreview = (message: UIMessage) => {
-  const textPart = message.parts.find(
-    (part): part is { type: "text"; text: string } => part.type === "text",
-  );
-  if (!textPart) return "";
-  const preview = textPart.text.trim().replace(/\s+/g, " ");
-  return preview.length > 80 ? `${preview.slice(0, 77)}...` : preview;
+const isMeaningfulSession = (session: ChatSession) =>
+  session.messages.some(isMeaningfulUserMessage);
+
+const enforceSessionLimit = (
+  sessions: ChatSession[],
+  activeId?: string | null,
+) => {
+  const sorted = [...sessions].sort((a, b) => b.createdAt - a.createdAt);
+  const limited: ChatSession[] = [];
+  for (const session of sorted) {
+    if (session.id === activeId || isMeaningfulSession(session)) {
+      if (
+        limited.length < MAX_SESSIONS ||
+        session.id === activeId ||
+        !isMeaningfulSession(session)
+      ) {
+        limited.push(session);
+      }
+    }
+    if (
+      limited.length >= MAX_SESSIONS &&
+      (!activeId || limited.some((s) => s.id === activeId))
+    ) {
+      break;
+    }
+  }
+  return limited;
+};
+
+const getSessionPreview = (session: ChatSession) => {
+  const lastAssistant = [...session.messages]
+    .reverse()
+    .find((message) => message.role === "assistant");
+  const fallbackUser = session.messages.find((message) => message.role === "user");
+  const text =
+    getTextFromMessage(lastAssistant ?? fallbackUser ?? createWelcomeMessage()) ||
+    "Conversation";
+  return text.length > 80 ? `${text.slice(0, 77)}...` : text;
 };
 
 export default function Chat() {
@@ -86,18 +204,13 @@ export default function Chat() {
   const [isClient, setIsClient] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [durations, setDurations] = useState<Record<string, number>>({});
-  const welcomeMessageShownRef = useRef<boolean>(false);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  const stored =
-    typeof window !== "undefined"
-      ? loadMessagesFromStorage()
-      : { messages: [], durations: {} };
-  const [initialMessages] = useState<UIMessage[]>(stored.messages);
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
 
   const { messages, sendMessage, status, stop, setMessages } = useChat({
-    messages: initialMessages,
+    messages: [],
   });
 
   // Check authentication on mount
@@ -106,9 +219,23 @@ export default function Chat() {
       const authStatus = sessionStorage.getItem("isAuthenticated");
       if (authStatus === "true") {
         setIsAuthenticated(true);
+        const storedSessions = loadSessionsFromStorage();
+        if (storedSessions.length > 0) {
+          const nextSessions = enforceSessionLimit(storedSessions);
+          const initialSession = nextSessions[0];
+          setSessions(nextSessions);
+          setActiveSessionId(initialSession.id);
+          setDurations(initialSession.durations || {});
+          setMessages(initialSession.messages || []);
+        } else {
+          const welcomeSession = createSession([createWelcomeMessage()]);
+          setSessions([welcomeSession]);
+          setActiveSessionId(welcomeSession.id);
+          setDurations({});
+          setMessages(welcomeSession.messages);
+          saveSessionsToStorage([welcomeSession]);
+        }
         setIsClient(true);
-        setDurations(stored.durations);
-        setMessages(stored.messages);
       } else {
         router.replace("/login");
       }
@@ -116,11 +243,34 @@ export default function Chat() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const updateSessions = useCallback(
+    (nextSessions: ChatSession[]) => {
+      const limited = enforceSessionLimit(nextSessions, activeSessionId);
+      setSessions(limited);
+      saveSessionsToStorage(limited);
+    },
+    [activeSessionId],
+  );
+
   useEffect(() => {
-    if (isClient) {
-      saveMessagesToStorage(messages, durations);
-    }
-  }, [durations, messages, isClient]);
+    if (!isClient || !activeSessionId) return;
+    updateSessions(
+      sessions.map((session) => {
+        if (session.id !== activeSessionId) return session;
+        const updated = {
+          ...session,
+          messages,
+          durations,
+        };
+        const newTitle = generateSessionTitle(messages, session.createdAt);
+        if (newTitle !== session.title) {
+          updated.title = newTitle;
+        }
+        return updated;
+      }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages, durations, isClient, activeSessionId]);
 
   const handleDurationChange = (key: string, duration: number) => {
     setDurations((prevDurations) => {
@@ -129,24 +279,6 @@ export default function Chat() {
       return newDurations;
     });
   };
-
-  useEffect(() => {
-    if (isClient && initialMessages.length === 0 && !welcomeMessageShownRef.current) {
-      const welcomeMessage: UIMessage = {
-        id: `welcome-${Date.now()}`,
-        role: "assistant",
-        parts: [
-          {
-            type: "text",
-            text: WELCOME_MESSAGE,
-          },
-        ],
-      };
-      setMessages([welcomeMessage]);
-      saveMessagesToStorage([welcomeMessage], {});
-      welcomeMessageShownRef.current = true;
-    }
-  }, [isClient, initialMessages.length, setMessages]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -164,13 +296,18 @@ export default function Chat() {
     }
   }
 
+  const startNewSession = () => {
+    const welcomeMessages = [createWelcomeMessage()];
+    const newSession = createSession(welcomeMessages);
+    setActiveSessionId(newSession.id);
+    setDurations({});
+    setMessages(welcomeMessages);
+    updateSessions([newSession, ...sessions]);
+    toast.success("Started a new chat");
+  };
+
   function clearChat() {
-    const newMessages: UIMessage[] = [];
-    const newDurations = {};
-    setMessages(newMessages);
-    setDurations(newDurations);
-    saveMessagesToStorage(newMessages, newDurations);
-    toast.success("Chat cleared");
+    startNewSession();
   }
 
   const handleFileButtonClick = () => {
@@ -183,6 +320,21 @@ export default function Chat() {
     setAttachedFiles(Array.from(files));
     // TODO: hook upload endpoint here and include uploaded URLs in chat payload.
   };
+
+  const handleSessionSelect = (sessionId: string) => {
+    if (sessionId === activeSessionId) return;
+    const selectedSession = sessions.find(
+      (session) => session.id === sessionId,
+    );
+    if (!selectedSession) return;
+    setActiveSessionId(selectedSession.id);
+    setDurations(selectedSession.durations || {});
+    setMessages(selectedSession.messages || []);
+  };
+
+  const displayedSessions = sessions
+    .filter((session) => session.id === activeSessionId || isMeaningfulSession(session))
+    .slice(0, MAX_SESSIONS);
 
   // Show loading state while checking authentication
   if (!isAuthenticated || !isClient) {
@@ -202,25 +354,26 @@ export default function Chat() {
             Chat History
           </p>
           <div className="mt-3 space-y-2 text-sm">
-            {isClient && messages.length > 0 ? (
-              [...messages]
-                .reverse()
-                .map((message) => {
-                  const preview = getMessagePreview(message);
-                  return (
-                    <div
-                      key={message.id}
-                      className="w-full rounded-2xl border border-[#f7b6b4] bg-gradient-to-br from-[#FFEAEA] to-[#FFD1D1] px-4 py-3 text-[#5B0A0E] shadow-[0_12px_30px_rgba(199,34,42,0.12)]"
-                    >
-                      <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                        {message.role === "user" ? "You" : AI_NAME}
-                      </p>
-                      <p className="truncate text-sm text-foreground">
-                        {preview || "Attachment"}
-                      </p>
-                    </div>
-                  );
-                })
+            {isClient && displayedSessions.length > 0 ? (
+              displayedSessions.map((session) => (
+                <button
+                  type="button"
+                  onClick={() => handleSessionSelect(session.id)}
+                  key={session.id}
+                  className={`w-full rounded-2xl border px-4 py-3 text-left shadow-[0_12px_30px_rgba(199,34,42,0.12)] transition ${
+                    session.id === activeSessionId
+                      ? "border-[#C7222A] bg-gradient-to-br from-[#FFE0E0] to-[#FFC5C5] text-[#5B0A0E]"
+                      : "border-[#f7b6b4] bg-gradient-to-br from-[#FFEAEA] to-[#FFD1D1] text-[#7A141C] hover:border-[#C7222A]"
+                  }`}
+                >
+                  <p className="text-[11px] uppercase tracking-wide text-[#7A141C]/70">
+                    {session.title}
+                  </p>
+                  <p className="truncate text-sm text-[#5B0A0E]">
+                    {getSessionPreview(session)}
+                  </p>
+                </button>
+              ))
             ) : (
               <div className="rounded-2xl border border-dashed border-[#f5b3b3]/60 bg-white/60 px-4 py-6 text-center text-xs text-[#7a141c]">
                 Start chatting to build your history. Messages automatically
@@ -230,7 +383,7 @@ export default function Chat() {
           </div>
         </div>
 
-        <div className="mt-auto text-[11px] text-foreground/80">
+        <div className="mt-auto text-[11px] font-semibold text-[#5B0A0E]">
           Tailored assistance for Air India sales, marketing, developers &amp; HR.
         </div>
       </aside>
