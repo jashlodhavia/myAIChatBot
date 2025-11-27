@@ -25,11 +25,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+const MAX_MESSAGE_LENGTH = 1200;
+const MAX_CONTEXT_MESSAGES = 12;
+
 const formSchema = z.object({
   message: z
     .string()
     .min(1, "Message cannot be empty.")
-    .max(2000, "Message must be at most 2000 characters."),
+    .max(
+      MAX_MESSAGE_LENGTH,
+      `Message must be at most ${MAX_MESSAGE_LENGTH} characters.`,
+    ),
 });
 
 const STORAGE_KEY = "chat-sessions";
@@ -162,6 +168,21 @@ const saveSessionsToStorage = (sessions: ChatSession[]) => {
 const isMeaningfulSession = (session: ChatSession) =>
   session.messages.some(isMeaningfulUserMessage);
 
+const filterDurationsByMessages = (
+  messages: UIMessage[],
+  durations: Record<string, number>,
+) => {
+  const allowedKeys = new Set<string>();
+  messages.forEach((message) => {
+    message.parts.forEach((_, index) => {
+      allowedKeys.add(`${message.id}-${index}`);
+    });
+  });
+  return Object.fromEntries(
+    Object.entries(durations).filter(([key]) => allowedKeys.has(key)),
+  );
+};
+
 const enforceSessionLimit = (
   sessions: ChatSession[],
   activeId?: string | null,
@@ -209,8 +230,20 @@ export default function Chat() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
 
+  const handleChatError = (error: Error) => {
+    const lowerMessage = error.message.toLowerCase();
+    if (lowerMessage.includes("rate_limit")) {
+      toast.error(
+        "We’re getting a lot of traffic right now. Please retry in a few seconds.",
+      );
+      return;
+    }
+    toast.error("Something went wrong. Please try again.");
+  };
+
   const { messages, sendMessage, status, stop, setMessages } = useChat({
     messages: [] as UIMessage[],
+    onError: handleChatError,
   });
 
   // Check authentication on mount
@@ -280,8 +313,31 @@ export default function Chat() {
     },
   });
 
+  useEffect(() => {
+    if (!isClient) return;
+    if (messages.length <= MAX_CONTEXT_MESSAGES) return;
+    const trimmedMessages = messages.slice(-MAX_CONTEXT_MESSAGES);
+    setMessages(trimmedMessages);
+    setDurations((prevDurations) =>
+      filterDurationsByMessages(trimmedMessages, prevDurations),
+    );
+  }, [messages, isClient, setMessages]);
+
   function onSubmit(data: z.infer<typeof formSchema>) {
-    sendMessage({ text: data.message });
+    const normalizedMessage = data.message.replace(/\s+/g, " ").trim();
+    if (!normalizedMessage) {
+      toast.error("Message cannot be empty.");
+      form.reset();
+      return;
+    }
+
+    let preparedMessage = normalizedMessage;
+    if (normalizedMessage.length > MAX_MESSAGE_LENGTH) {
+      preparedMessage = normalizedMessage.slice(0, MAX_MESSAGE_LENGTH);
+      toast.info("Long message shortened to avoid rate limits.");
+    }
+
+    sendMessage({ text: preparedMessage });
     form.reset();
     setAttachedFiles([]);
     if (fileInputRef.current) {
