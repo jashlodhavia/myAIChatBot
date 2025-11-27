@@ -101,17 +101,6 @@ const generateSessionTitle = (messages: UIMessage[], createdAt: number) => {
   return `${matchedCategory} · ${dateLabel}`;
 };
 
-const createWelcomeMessage = (): UIMessage => ({
-  id: `welcome-${Date.now()}`,
-  role: "assistant",
-  parts: [
-    {
-      type: "text",
-      text: WELCOME_MESSAGE,
-    },
-  ],
-});
-
 const createSession = (messages: UIMessage[] = []): ChatSession => {
   const createdAt = Date.now();
   return {
@@ -194,8 +183,7 @@ const getSessionPreview = (session: ChatSession) => {
     .find((message) => message.role === "assistant");
   const fallbackUser = session.messages.find((message) => message.role === "user");
   const text =
-    getTextFromMessage(lastAssistant ?? fallbackUser ?? createWelcomeMessage()) ||
-    "Conversation";
+    getTextFromMessage(lastAssistant ?? fallbackUser) || WELCOME_MESSAGE;
   return text.length > 80 ? `${text.slice(0, 77)}...` : text;
 };
 
@@ -240,11 +228,11 @@ export default function Chat() {
           setDurations(initialSession.durations || {});
           setMessages(initialSession.messages || []);
         } else {
-          const welcomeSession = createSession([createWelcomeMessage()]);
+          const welcomeSession = createSession([]);
           setSessions([welcomeSession]);
           setActiveSessionId(welcomeSession.id);
           setDurations({});
-          setMessages(welcomeSession.messages);
+          setMessages([]);
           saveSessionsToStorage([welcomeSession]);
         }
         setIsClient(true);
@@ -302,7 +290,7 @@ export default function Chat() {
   }
 
   const startNewSession = () => {
-    const welcomeMessages = [createWelcomeMessage()];
+    const welcomeMessages: UIMessage[] = [];
     const newSession = createSession(welcomeMessages);
     setActiveSessionId(newSession.id);
     setDurations({});
