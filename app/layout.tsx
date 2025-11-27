@@ -15,6 +15,14 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "MyAI3",
   description: "MyAI3",
+  icons: {
+    icon: [
+      {
+        url: "/air-india-logo.png",
+        type: "image/png",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
