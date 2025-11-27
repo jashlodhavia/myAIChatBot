@@ -182,8 +182,10 @@ const getSessionPreview = (session: ChatSession) => {
     .reverse()
     .find((message) => message.role === "assistant");
   const fallbackUser = session.messages.find((message) => message.role === "user");
-  const text =
-    getTextFromMessage(lastAssistant ?? fallbackUser) || WELCOME_MESSAGE;
+  const baseMessage = lastAssistant ?? fallbackUser;
+  const text = baseMessage
+    ? getTextFromMessage(baseMessage)
+    : WELCOME_MESSAGE;
   return text.length > 80 ? `${text.slice(0, 77)}...` : text;
 };
 
