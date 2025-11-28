@@ -12,17 +12,17 @@ type AnswerCardProps = {
 const StreamingIndicator = ({ isStreaming }: { isStreaming?: boolean }) => {
   if (!isStreaming) {
     return (
-      <span className="text-[11px] font-medium tracking-[0.2em] text-[#7A141C]/70">
+      <span className="text-[11px] font-medium tracking-[0.2em] text-[#9D0027]/70">
         Responded
       </span>
     );
   }
 
   return (
-    <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-[#C7222A]">
+    <span className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-[#9D0027]">
       <span className="relative flex h-3 w-3">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#C7222A]/40" />
-        <span className="relative inline-flex h-3 w-3 rounded-full bg-[#C7222A]" />
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#9D0027]/40" />
+        <span className="relative inline-flex h-3 w-3 rounded-full bg-[#9D0027]" />
       </span>
       Writing live
     </span>
@@ -37,28 +37,25 @@ export function AnswerCard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-[32px] border border-[#f8bdba]/70 bg-white/80 p-6 shadow-[0_30px_80px_rgba(199,34,42,0.12)] backdrop-blur-2xl",
+        "relative overflow-hidden rounded-[32px] border border-gray-200 bg-white p-6 pl-7 shadow-sm",
         className,
       )}
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 rounded-[32px] bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.9),_transparent_55%),linear-gradient(145deg,#fff5f4,#ffe1df)] opacity-90"
-      />
+
       <div className="relative space-y-4">
         <div className="flex items-center justify-between">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.4em] text-[#7A141C]/80">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.4em] text-[#9D0027]/80">
             AirIndiaGuide.AI
           </div>
           <StreamingIndicator isStreaming={isStreaming} />
         </div>
-        <div className="rounded-3xl bg-white/60 p-4 text-base leading-relaxed text-[#3D0C12] shadow-inner transition duration-200 hover:bg-white">
+        <div className="rounded-3xl bg-gray-50 px-6 py-4 text-sm leading-relaxed text-[#2A1B1B] shadow-sm">
           {children}
         </div>
-        <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.5em] text-[#7A141C]/60">
-          <span className="h-px flex-1 bg-gradient-to-r from-transparent via-[#f2a6a1] to-[#7A141C]/50" />
+        <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.5em] text-gray-400">
+          <span className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
           curated insight
-          <span className="h-px flex-1 bg-gradient-to-l from-transparent via-[#f2a6a1] to-[#7A141C]/50" />
+          <span className="h-px flex-1 bg-gradient-to-l from-transparent via-gray-300 to-transparent" />
         </div>
       </div>
     </div>

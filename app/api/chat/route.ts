@@ -3,24 +3,50 @@ import { streamText, UIMessage, convertToModelMessages, stepCountIs, createUIMes
 import { MODEL } from '@/config';
 import { SYSTEM_PROMPT } from '@/prompts';
 import { isContentFlagged } from '@/lib/moderation';
+import { isSafetyRelated, sendSafetyAlertEmail } from '@/lib/email';
 import { webSearch } from './tools/web-search';
 import { vectorDatabaseSearch } from './tools/search-vector-database';
 
 export const maxDuration = 30;
 export async function POST(req: Request) {
-    const { messages }: { messages: UIMessage[] } = await req.json();
+    const body = await req.json();
+    const { messages } = body;
+    
+    // Try to get username from request body, cookies, or use default
+    let username = body.username;
+    if (!username) {
+        // Try to get from cookies as fallback
+        const cookies = req.headers.get('cookie');
+        if (cookies) {
+            const usernameMatch = cookies.match(/username=([^;]+)/);
+            username = usernameMatch ? decodeURIComponent(usernameMatch[1]) : 'unknown';
+        } else {
+            username = 'unknown';
+        }
+    }
 
     const latestUserMessage = messages
-        .filter(msg => msg.role === 'user')
+        .filter((msg: UIMessage) => msg.role === 'user')
         .pop();
 
     if (latestUserMessage) {
         const textParts = latestUserMessage.parts
-            .filter(part => part.type === 'text')
-            .map(part => 'text' in part ? part.text : '')
+            .filter((part: any) => part.type === 'text')
+            .map((part: any) => 'text' in part ? part.text : '')
             .join('');
 
         if (textParts) {
+            // Check for safety/hazardous keywords and send email alert
+            if (isSafetyRelated(textParts)) {
+                // Get username from request body or use a default
+                const user = username || 'unknown';
+                
+                // Send email alert asynchronously (don't wait for it)
+                sendSafetyAlertEmail(user, textParts).catch(error => {
+                    console.error('Failed to send safety alert email:', error);
+                });
+            }
+            
             const moderationResult = await isContentFlagged(textParts);
 
             if (moderationResult.flagged) {
