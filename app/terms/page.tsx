@@ -9,9 +9,9 @@ type TermBlockProps = {
 
 function TermBlock({ title, items }: TermBlockProps) {
   return (
-    <section className="space-y-4 rounded-3xl border border-white/20 bg-black/30 px-6 py-5 shadow-inner">
-      <h3 className="text-xl font-semibold text-[#D4AF37]">{title}</h3>
-      <ol className="list-decimal space-y-4 pl-5 text-sm leading-relaxed text-white">
+    <section className="space-y-3 sm:space-y-4 rounded-2xl sm:rounded-3xl border border-white/20 bg-black/30 px-4 sm:px-6 py-4 sm:py-5 shadow-inner">
+      <h3 className="text-lg sm:text-xl font-semibold text-[#D4AF37]">{title}</h3>
+      <ol className="list-decimal space-y-3 sm:space-y-4 pl-4 sm:pl-5 text-xs sm:text-sm leading-relaxed text-white">
         {items.map((item, index) => (
           <li key={`${title}-${index}`} className="pl-2">
             {item}
@@ -24,14 +24,14 @@ function TermBlock({ title, items }: TermBlockProps) {
 
 export default function Terms() {
   return (
-    <div className="flex h-screen items-stretch font-sans dark:bg-black">
+    <div className="flex flex-col md:flex-row min-h-screen font-sans dark:bg-black">
       {/* Left sidebar */}
-      <aside className="hidden md:flex flex-col w-72 border-r bg-[#9D0027] text-white px-6 py-6 gap-8">
+      <aside className="flex flex-col w-full md:w-72 border-b md:border-b-0 md:border-r bg-[#9D0027] text-white px-4 sm:px-6 py-6 gap-6 md:gap-8">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
             Legal Information
           </p>
-          <div className="mt-6 space-y-4">
+          <div className="mt-4 space-y-4">
             <p className="text-sm text-white/90">
               These terms describe how you may interact with AirIndiaGuide.AI, an
               experimental employee onboarding concierge crafted by {OWNER_NAME}. It is
@@ -44,26 +44,26 @@ export default function Terms() {
             </div>
           </div>
         </div>
-        <div className="mt-auto text-[11px] font-semibold text-white/90">
+        <div className="text-[11px] font-semibold text-white/90">
           Tailored assistance for Air India sales, marketing, developers &amp; HR.
         </div>
       </aside>
 
       {/* Main content area */}
-      <main className="flex-1 dark:bg-black h-screen overflow-y-auto">
-        <div className="mx-auto w-full max-w-6xl flex flex-col gap-10 px-6 py-14 md:px-12">
-          <div className="flex w-full flex-col gap-6">
+      <main className="flex-1 dark:bg-black overflow-y-auto">
+        <div className="mx-auto w-full max-w-6xl flex flex-col gap-6 sm:gap-8 md:gap-10 px-4 sm:px-6 py-6 sm:py-10 md:px-12 md:py-14">
+          <div className="flex w-full flex-col gap-4 sm:gap-6">
             <Link
               href="/"
-              className="inline-flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-[0.4em] text-white/70 transition hover:text-white md:justify-start"
+              className="inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-semibold uppercase tracking-[0.4em] text-white/70 transition hover:text-white md:justify-start"
             >
-              <ArrowLeftIcon className="h-4 w-4" />
+              <ArrowLeftIcon className="h-3 w-3 sm:h-4 sm:w-4" />
               Back to Chatbot
             </Link>
 
-            <div className="w-full rounded-[32px] border border-white/20 bg-black/40 p-8 text-base leading-relaxed text-white shadow-[0_40px_120px_rgba(157,0,39,0.2)] backdrop-blur-2xl md:p-10">
-              <section className="space-y-4">
-                <h2 className="text-2xl font-semibold text-[#D4AF37]">
+            <div className="w-full rounded-[24px] sm:rounded-[32px] border border-white/20 bg-black/40 p-4 sm:p-6 md:p-8 lg:p-10 text-sm sm:text-base leading-relaxed text-white shadow-[0_40px_120px_rgba(157,0,39,0.2)] backdrop-blur-2xl">
+              <section className="space-y-3 sm:space-y-4">
+                <h2 className="text-xl sm:text-2xl font-semibold text-[#D4AF37]">
                   Terms of Use / Disclaimer
                 </h2>
                 <p className="text-white">
@@ -74,7 +74,7 @@ export default function Terms() {
                 </p>
               </section>
 
-              <div className="mt-8 space-y-6">
+              <div className="mt-6 sm:mt-8 space-y-4 sm:space-y-6">
                 <TermBlock
                   title="General Information"
                   items={[
