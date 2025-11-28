@@ -127,8 +127,8 @@ const loadSessionsFromStorage = (): ChatSession[] => {
           id: `session-${Date.now()}`,
           title: "General Assistance",
           createdAt: Date.now(),
-      messages: parsed.messages || [],
-      durations: parsed.durations || {},
+          messages: parsed.messages || [],
+          durations: parsed.durations || {},
         },
       ];
     }
@@ -222,8 +222,9 @@ export default function Chat() {
       if (authStatus === "true") {
         setIsAuthenticated(true);
         const storedSessions = loadSessionsFromStorage();
-        if (storedSessions.length > 0) {
-          const nextSessions = enforceSessionLimit(storedSessions);
+        const nextSessions = storedSessions.length > 0 ? enforceSessionLimit(storedSessions) : [];
+
+        if (nextSessions.length > 0) {
           const initialSession = nextSessions[0];
           setSessions(nextSessions);
           setActiveSessionId(initialSession.id);
@@ -349,34 +350,33 @@ export default function Chat() {
   return (
     <div className="flex h-screen items-stretch font-sans dark:bg-black">
       {/* Left sidebar */}
-      <aside className="hidden md:flex flex-col w-72 border-r bg-gradient-to-b from-[#FFF6F6] via-[#FFE5E5] to-[#FFCFCF] text-[#5B0A0E] px-6 py-6 gap-8">
+      <aside className="hidden md:flex flex-col w-72 border-r bg-[#9D0027] text-white px-6 py-6 gap-8">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-foreground">
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
             Chat History
           </p>
           <div className="mt-3 space-y-2 text-sm">
             {isClient && displayedSessions.length > 0 ? (
               displayedSessions.map((session) => (
-            <button
+                <button
                   type="button"
                   onClick={() => handleSessionSelect(session.id)}
                   key={session.id}
-                  className={`w-full rounded-2xl border px-4 py-3 text-left shadow-[0_12px_30px_rgba(199,34,42,0.12)] transition ${
-                    session.id === activeSessionId
-                      ? "border-[#C7222A] bg-gradient-to-br from-[#FFE0E0] to-[#FFC5C5] text-[#5B0A0E]"
-                      : "border-[#f7b6b4] bg-gradient-to-br from-[#FFEAEA] to-[#FFD1D1] text-[#7A141C] hover:border-[#C7222A]"
-                  }`}
+                  className={`w-full rounded-2xl border px-4 py-3 text-left shadow-sm transition ${session.id === activeSessionId
+                    ? "border-[#D4AF37] bg-white/20 text-[#D4AF37]"
+                    : "border-white/30 bg-white/10 text-[#D4AF37]/90 hover:bg-white/20"
+                    }`}
                 >
-                  <p className="text-[11px] uppercase tracking-wide text-[#7A141C]/70">
+                  <p className="text-[11px] uppercase tracking-wide text-[#D4AF37]/70">
                     {session.title}
                   </p>
-                  <p className="truncate text-sm text-[#5B0A0E]">
+                  <p className="truncate text-sm text-[#D4AF37]">
                     {getSessionPreview(session)}
                   </p>
-            </button>
+                </button>
               ))
             ) : (
-              <div className="rounded-2xl border border-dashed border-[#f5b3b3]/60 bg-white/60 px-4 py-6 text-center text-xs text-[#7a141c]">
+              <div className="rounded-2xl border border-dashed border-white/30 bg-white/10 px-4 py-6 text-center text-xs text-white/80">
                 Start chatting to build your history. Messages automatically
                 stay here thanks to local storage.
               </div>
@@ -384,7 +384,7 @@ export default function Chat() {
           </div>
         </div>
 
-        <div className="mt-auto text-[11px] font-semibold text-[#5B0A0E]">
+        <div className="mt-auto text-[11px] font-semibold text-[#D4AF37]">
           Tailored assistance for Air India sales, marketing, developers &amp; HR.
         </div>
       </aside>
@@ -396,21 +396,14 @@ export default function Chat() {
             <ChatHeader>
               <ChatHeaderBlock />
               <ChatHeaderBlock className="justify-center items-center">
-                <Avatar
-                  className="size-8 ring-1 ring-primary"
-                >
-                  <AvatarImage src="/air-india-logo.png" />
-                  <AvatarFallback>
-                    <Image src="/air-india-logo.png" alt="Logo" width={36} height={36} />
-                  </AvatarFallback>
-                </Avatar>
-                <p className="tracking-tight">Chat with {AI_NAME}</p>
+                <Image src="/air-india-logo.png" alt="Logo" width={80} height={80} />
+                <p className="tracking-tight">Take-Off with Onboardly</p>
               </ChatHeaderBlock>
               <ChatHeaderBlock className="justify-end">
                 <Button
                   variant="outline"
-                  size="sm"
-                  className="cursor-pointer"
+                  size="default"
+                  className="cursor-pointer border-[#D4AF37] bg-[#D4AF37] text-white hover:bg-white hover:text-[#D4AF37] transition-colors h-10 px-4"
                   onClick={clearChat}
                 >
                   <Plus className="size-4" />
@@ -454,10 +447,10 @@ export default function Chat() {
             )}
           </div>
         </div>
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-linear-to-t from-background via-background/50 to-transparent dark:bg-black overflow-visible pt-13">
+        <div className="fixed bottom-0 left-0 right-0 md:left-72 z-50 bg-linear-to-t from-background via-background/50 to-transparent dark:bg-black overflow-visible pt-13">
           <div className="w-full px-5 pt-5 pb-1 items-center flex justify-center relative overflow-visible">
             <div className="message-fade-overlay" />
-            <div className="max-w-3xl w-full pl-11">
+            <div className="max-w-3xl w-full">
               <form id="chat-form" onSubmit={form.handleSubmit(onSubmit)}>
                 <FieldGroup>
                   <Controller
@@ -489,7 +482,7 @@ export default function Chat() {
                           <Input
                             {...field}
                             id="chat-form-message"
-                            className="h-15 pr-15 pl-11 rounded-[20px] border-2 border-[#C7222A] bg-card focus:border-[#A91B20]"
+                            className="h-15 pr-15 pl-11 rounded-[20px] border-2 border-[#D4AF37] bg-card focus:border-[#D4AF37] focus:ring-[#D4AF37]/50"
                             placeholder="Type your message here..."
                             disabled={status === "streaming"}
                             aria-invalid={fieldState.invalid}

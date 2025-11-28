@@ -17,7 +17,7 @@ export function AssistantMessage({ message, status, isLastMessage, durations, on
                         return (
                             <AnswerCard key={`${message.id}-${i}`} isStreaming={isStreaming}>
                                 <Response
-                                    className="prose prose-neutral mx-auto max-w-none text-base leading-relaxed text-[#3D0C12] sm:text-lg prose-headings:text-[#7A141C] prose-headings:font-bold prose-strong:text-[#A2131A] prose-strong:font-semibold prose-li:leading-relaxed [&_ol>li]:font-medium [&_ol>li::marker]:font-bold [&_ul>li::marker]:text-[#C7222A] [&_p:first-child]:font-semibold [&_p:first-child]:text-[#2C060A] [&_p:not(:first-child)]:mt-2 [&_h3]:text-lg [&_h4]:text-base text-left"
+                                    className="prose prose-neutral mx-auto max-w-none text-sm leading-relaxed text-[#2A1B1B] sm:text-base prose-headings:text-[#2A1B1B] prose-headings:font-bold prose-strong:text-[#9D0027] prose-strong:font-semibold prose-ul:pl-5 prose-ol:pl-6 prose-li:ml-0 prose-li:leading-relaxed [&_ol>li]:font-medium [&_ol>li::marker]:font-bold [&_ul>li::marker]:text-[#9D0027] [&_p:first-child]:font-semibold [&_p:first-child]:text-[#2A1B1B] [&_p:not(:first-child)]:mt-2 [&_h3]:text-base [&_h4]:text-sm text-left"
                                 >
                                     {part.text}
                                 </Response>
