@@ -348,21 +348,21 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex h-screen items-stretch font-sans dark:bg-black">
+    <div className="flex flex-col md:flex-row h-screen items-stretch font-sans dark:bg-black">
       {/* Left sidebar */}
-      <aside className="hidden md:flex flex-col w-72 border-r bg-[#9D0027] text-white px-6 py-6 gap-8">
+      <aside className="flex flex-col w-full md:w-72 border-b md:border-b-0 md:border-r bg-[#9D0027] text-white px-4 sm:px-6 py-4 sm:py-6 gap-6 md:gap-8 flex-shrink-0">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#D4AF37]">
             Chat History
           </p>
-          <div className="mt-3 space-y-2 text-sm">
+          <div className="mt-3 flex gap-3 overflow-x-auto pb-2 text-sm md:flex-col md:space-y-2 md:overflow-visible md:pb-0">
             {isClient && displayedSessions.length > 0 ? (
               displayedSessions.map((session) => (
                 <button
                   type="button"
                   onClick={() => handleSessionSelect(session.id)}
                   key={session.id}
-                  className={`w-full rounded-2xl border px-4 py-3 text-left shadow-sm transition ${session.id === activeSessionId
+                  className={`min-w-[220px] md:min-w-0 rounded-2xl border px-4 py-3 text-left shadow-sm transition ${session.id === activeSessionId
                     ? "border-[#D4AF37] bg-white/20 text-[#D4AF37]"
                     : "border-white/30 bg-white/10 text-[#D4AF37]/90 hover:bg-white/20"
                     }`}
@@ -390,42 +390,45 @@ export default function Chat() {
       </aside>
 
       {/* Main chat area */}
-      <main className="flex-1 dark:bg-black h-screen relative">
-        <div className="fixed top-0 left-0 right-0 md:left-72 z-50 bg-linear-to-b from-background via-background/50 to-transparent dark:bg-black overflow-visible pb-16">
+      <main className="flex-1 dark:bg-black h-full md:h-screen relative w-full">
+        <div className="md:fixed top-0 left-0 right-0 md:left-72 z-40 bg-linear-to-b from-background via-background/50 to-transparent dark:bg-black overflow-visible pb-4 md:pb-16">
           <div className="relative overflow-visible">
             <ChatHeader>
-              <ChatHeaderBlock />
-              <ChatHeaderBlock className="justify-center items-center">
-                <Image src="/air-india-logo.png" alt="Logo" width={80} height={80} />
-                <p className="tracking-tight">Take-Off with Onboardly</p>
-              </ChatHeaderBlock>
-              <ChatHeaderBlock className="justify-end">
-                <Button
-                  variant="outline"
-                  size="default"
-                  className="cursor-pointer border-[#D4AF37] bg-[#D4AF37] text-white hover:bg-white hover:text-[#D4AF37] transition-colors h-10 px-4"
-                  onClick={clearChat}
-                >
-                  <Plus className="size-4" />
-                  {CLEAR_CHAT_TEXT}
-                </Button>
-              </ChatHeaderBlock>
+              <div className="flex w-full flex-col gap-3 md:flex-row md:items-center md:gap-4">
+                <div className="flex w-full md:w-auto items-center justify-center md:justify-start">
+                  <Image src="/air-india-logo.png" alt="Logo" width={80} height={80} className="w-20 h-auto" />
+                </div>
+                <div className="flex flex-1 items-center justify-center">
+                  <p className="text-base sm:text-lg font-semibold text-center">Take-Off with Onboardly</p>
+                </div>
+                <div className="flex w-full md:w-auto items-center justify-center md:justify-end">
+                  <Button
+                    variant="outline"
+                    size="default"
+                    className="cursor-pointer border-[#D4AF37] bg-[#D4AF37] text-white hover:bg-white hover:text-[#D4AF37] transition-colors h-9 sm:h-10 px-4 w-full max-w-[180px] md:max-w-none"
+                    onClick={clearChat}
+                  >
+                    <Plus className="size-4" />
+                    <span className="ml-1 text-sm">{CLEAR_CHAT_TEXT}</span>
+                  </Button>
+                </div>
+              </div>
             </ChatHeader>
           </div>
         </div>
-        <div className="h-screen overflow-y-auto px-5 py-4 w-full pt-[88px] pb-[150px]">
+        <div className="h-full md:h-screen overflow-y-auto px-4 sm:px-5 py-4 w-full pt-0 pb-[150px] md:pt-[88px] md:pb-[150px]">
           <div className="flex flex-col items-center justify-end min-h-full">
             {isClient ? (
               <>
                 <div className="w-full flex justify-center mb-4">
                   <div className="max-w-3xl w-full">
-                    <h2 className="pl-11 text-xl font-semibold tracking-tight">
+                    <h2 className="pl-0 md:pl-11 text-xl font-semibold tracking-tight">
                       Conversation
                     </h2>
                   </div>
                 </div>
                 <div className="w-full flex justify-center">
-                  <div className="max-w-3xl w-full pl-11">
+                  <div className="max-w-3xl w-full pl-0 md:pl-11">
                     <MessageWall
                       messages={messages}
                       status={status}

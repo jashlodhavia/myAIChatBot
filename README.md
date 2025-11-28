@@ -1,10 +1,10 @@
-# MyAI3
+# AirIndia
 
 A customizable AI chatbot assistant built with Next.js, featuring web search capabilities, vector database integration, and content moderation. This repository provides a complete foundation for deploying your own AI assistant with minimal technical knowledge required.
 
 ## Overview
 
-MyAI3 is an AI-powered chatbot that can:
+AirIndia is an AI-powered chatbot that can:
 
 - Answer questions using advanced language models
 - Search the web for up-to-date information
