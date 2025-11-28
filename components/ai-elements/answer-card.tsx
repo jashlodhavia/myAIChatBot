@@ -37,7 +37,7 @@ export function AnswerCard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-[32px] border border-[#f8bdba]/70 bg-white/80 p-6 shadow-[0_30px_80px_rgba(199,34,42,0.12)] backdrop-blur-2xl",
+        "relative overflow-hidden rounded-[32px] border border-[#f8bdba]/70 bg-white/80 p-6 pl-7 shadow-[0_30px_80px_rgba(199,34,42,0.12)] backdrop-blur-2xl",
         className,
       )}
     >
