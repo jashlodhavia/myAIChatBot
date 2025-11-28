@@ -198,6 +198,17 @@ export default function Chat() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const scrollChatToBottom = (behavior: ScrollBehavior = "auto") => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior,
+      });
+    }
+  };
 
   const handleChatError = (error: Error) => {
     const lowerMessage = error.message.toLowerCase();
@@ -267,6 +278,14 @@ export default function Chat() {
       return limited;
     });
   }, [messages, durations, isClient, activeSessionId]);
+
+  useEffect(() => {
+    if (!isClient) return;
+    const timeout = setTimeout(() => {
+      scrollChatToBottom("auto");
+    }, 150);
+    return () => clearTimeout(timeout);
+  }, [isClient, messages]);
 
   const handleDurationChange = (key: string, duration: number) => {
     setDurations((prevDurations) => {
@@ -416,7 +435,7 @@ export default function Chat() {
             </ChatHeader>
           </div>
         </div>
-        <div className="h-full md:h-screen overflow-y-auto px-4 sm:px-5 py-4 w-full pt-0 pb-[150px] md:pt-[88px] md:pb-[150px]">
+        <div ref={scrollContainerRef} className="h-full md:h-screen overflow-y-auto px-4 sm:px-5 py-4 w-full pt-0 pb-[150px] md:pt-[88px] md:pb-[150px]">
           <div className="flex flex-col items-center justify-end min-h-full">
             {isClient ? (
               <>
@@ -434,6 +453,7 @@ export default function Chat() {
                       status={status}
                       durations={durations}
                       onDurationChange={handleDurationChange}
+                      scrollContainerRef={scrollContainerRef}
                     />
                     {status === "submitted" && (
                       <div className="flex justify-start w-full">
