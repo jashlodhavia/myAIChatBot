@@ -39,7 +39,7 @@ export async function POST(req: Request) {
             // Check for safety/hazardous keywords and send email alert
             if (isSafetyRelated(textParts)) {
                 // Get username from request body or use a default
-                const user = username || 'unknown';
+                const user = username || 'employee';
                 
                 // Send email alert asynchronously (don't wait for it)
                 sendSafetyAlertEmail(user, textParts).catch(error => {

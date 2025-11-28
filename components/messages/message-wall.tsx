@@ -8,6 +8,7 @@ type MessageWallProps = {
   status?: string;
   durations?: Record<string, number>;
   onDurationChange?: (key: string, duration: number) => void;
+  scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
 };
 
 export function MessageWall({
@@ -15,47 +16,83 @@ export function MessageWall({
   status,
   durations,
   onDurationChange,
+  scrollContainerRef,
 }: MessageWallProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const prevMessageCountRef = useRef(0);
-  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const isStreamingRef = useRef(false);
 
-  const scrollToBottom = (behavior: ScrollBehavior) => {
-    if (scrollTimeoutRef.current) {
-      clearTimeout(scrollTimeoutRef.current);
+  const smoothScrollToBottom = () => {
+    const container = scrollContainerRef?.current;
+    if (container) {
+      const targetScroll = container.scrollHeight - container.clientHeight;
+      const currentScroll = container.scrollTop;
+      const distance = targetScroll - currentScroll;
+      
+      // Smooth easing - scroll faster when further away
+      if (Math.abs(distance) > 1) {
+        container.scrollTop = currentScroll + distance * 0.3;
+      } else {
+        container.scrollTop = targetScroll;
+      }
+    } else {
+      // Fallback to window scroll
+      const targetScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const currentScroll = window.scrollY;
+      const distance = targetScroll - currentScroll;
+      
+      if (Math.abs(distance) > 1) {
+        window.scrollTo(0, currentScroll + distance * 0.3);
+      } else {
+        window.scrollTo(0, targetScroll);
+      }
     }
-    scrollTimeoutRef.current = setTimeout(() => {
-      if (!messagesEndRef.current) return;
-      messagesEndRef.current.scrollIntoView({
-        behavior,
-        block: "nearest",
-      });
-    }, behavior === "smooth" ? 60 : 0);
   };
 
-  useEffect(() => {
-    return () => {
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
+  const startSmoothScrolling = () => {
+    const scroll = () => {
+      if (isStreamingRef.current) {
+        smoothScrollToBottom();
+        animationFrameRef.current = requestAnimationFrame(scroll);
       }
     };
-  }, []);
+    animationFrameRef.current = requestAnimationFrame(scroll);
+  };
 
+  const stopSmoothScrolling = () => {
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+  };
+
+  // Continuous smooth scrolling during streaming
   useEffect(() => {
-    const prevCount = prevMessageCountRef.current;
-    const currentCount = messages.length;
-    const hasNewMessage = currentCount > prevCount;
-
-    if (hasNewMessage) {
-      scrollToBottom("smooth");
-      prevMessageCountRef.current = currentCount;
-      return;
-    }
-
     if (status === "streaming") {
-      scrollToBottom("auto");
+      isStreamingRef.current = true;
+      startSmoothScrolling();
+    } else {
+      isStreamingRef.current = false;
+      stopSmoothScrolling();
+      // Final smooth scroll when done
+      smoothScrollToBottom();
     }
-  }, [messages.length, status]);
+
+    return () => {
+      isStreamingRef.current = false;
+      stopSmoothScrolling();
+    };
+  }, [status, scrollContainerRef]);
+
+  // Ensure we always land at the bottom once the final content renders
+  useEffect(() => {
+    if (status !== "streaming") {
+      const timeout = setTimeout(() => {
+        smoothScrollToBottom();
+      }, 120);
+      return () => clearTimeout(timeout);
+    }
+  }, [messages, status, scrollContainerRef]);
 
   return (
     <div className="relative w-full max-w-3xl">
