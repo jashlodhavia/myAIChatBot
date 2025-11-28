@@ -26,13 +26,13 @@ export async function POST(req: Request) {
     }
 
     const latestUserMessage = messages
-        .filter(msg => msg.role === 'user')
+        .filter((msg: UIMessage) => msg.role === 'user')
         .pop();
 
     if (latestUserMessage) {
         const textParts = latestUserMessage.parts
-            .filter(part => part.type === 'text')
-            .map(part => 'text' in part ? part.text : '')
+            .filter((part: any) => part.type === 'text')
+            .map((part: any) => 'text' in part ? part.text : '')
             .join('');
 
         if (textParts) {
